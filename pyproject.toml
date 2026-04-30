@@ -34,6 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 doc = ["Sphinx"]
+datastore = ["google-cloud-datastore"]
 test = ["pytest", "pytest-cov"]
 
 [project.scripts]
