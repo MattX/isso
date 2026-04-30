@@ -76,3 +76,7 @@ ENV/
 
 # PyCharm/IntelliJ IDEA project files
 .idea/
+
+# UV
+uv.lock
+

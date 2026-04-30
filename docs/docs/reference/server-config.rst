@@ -43,6 +43,7 @@ Here are the **default values** for this section:
 .. code-block:: ini
 
     [general]
+    db = sqlite
     dbpath = /tmp/comments.db
     name =
     host =
@@ -52,6 +53,12 @@ Here are the **default values** for this section:
     gravatar = false
     gravatar-url = https://www.gravatar.com/avatar/{}?d=identicon&s=55
     latest-enabled = false
+
+db
+    Database backend. Use ``sqlite`` for the default local database, or
+    ``datastore`` for Google Cloud Datastore / Firestore in Datastore mode.
+
+    Default: ``sqlite``
 
 dbpath
     File location to the SQLite3 database, highly recommended to change this
@@ -423,6 +430,49 @@ website-field
     Default: ``true``
 
     .. versionadded:: 0.14.1
+
+Datastore
+---------
+
+Configure the Google Cloud Datastore backend. Set ``[general] db = datastore``
+to enable it. Existing Ossi comment entities can be reused by pointing
+``kind`` at the same Datastore kind. Install the optional dependency with
+``pip install isso[datastore]``.
+
+.. code-block:: ini
+
+    [datastore]
+    project =
+    database =
+    namespace =
+    kind = comments
+    thread-kind = comments_threads
+    preference-kind = comments_preferences
+
+project
+    Google Cloud project ID. Leave empty to use Application Default
+    Credentials.
+
+database
+    Datastore database ID. Leave empty for the default database.
+
+namespace
+    Optional Datastore namespace.
+
+kind
+    Datastore kind that contains comment entities.
+
+    Default: ``comments``
+
+thread-kind
+    Datastore kind used for Isso thread metadata.
+
+    Default: ``comments_threads``
+
+preference-kind
+    Datastore kind used for Isso preferences such as the session key.
+
+    Default: ``comments_preferences``
 
 .. _configure-markup:
 

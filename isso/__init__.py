@@ -97,7 +97,13 @@ class ProxyFixCustom(ProxyFix):
 class Isso(object):
     def __init__(self, conf):
         self.conf = conf
-        self.db = db.SQLite3(conf.get("general", "dbpath"), conf)
+        backend = conf.get("general", "db") if conf.has_option("general", "db") else "sqlite"
+        if backend == "sqlite":
+            self.db = db.SQLite3(conf.get("general", "dbpath"), conf)
+        elif backend == "datastore":
+            self.db = db.Datastore(conf)
+        else:
+            raise RuntimeError("unknown database backend: %s" % backend)
         self.signer = URLSafeTimedSerializer(self.db.preferences.get("session-key"))
         self.markup = html.Markup(conf)
         self.hasher = hash.new(conf.section("hash"))
@@ -184,7 +190,11 @@ def make_app(conf=None, threading=True, multiprocessing=False, uwsgi=False):
 
     isso = App(conf)
 
-    logger.info("Using database at '%s'", abspath(isso.conf.get("general", "dbpath")))
+    backend = isso.conf.get("general", "db") if isso.conf.has_option("general", "db") else "sqlite"
+    if backend == "sqlite":
+        logger.info("Using database at '%s'", abspath(isso.conf.get("general", "dbpath")))
+    else:
+        logger.info("Using '%s' database backend", backend)
 
     if not any(conf.getiter("general", "host")):
         logger.error("No website(s) configured, Isso won't work.")
