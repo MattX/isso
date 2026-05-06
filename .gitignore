@@ -80,3 +80,5 @@ ENV/
 # UV
 uv.lock
 
+# My config
+isso.cfg

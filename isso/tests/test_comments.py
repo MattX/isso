@@ -333,6 +333,16 @@ class TestComments(unittest.TestCase):
         # assert order of nested comments is oldest first
         self.assertEqual([comment["id"] for comment in rv["replies"][0]["replies"]], [2, 3, 4, 5, 6])
 
+    def testAdminThreadLinksUseConfiguredHost(self):
+        self.conf.set("admin", "enabled", "true")
+        self.conf.set("general", "host", "https://www.example.org/")
+        self.post("/new?uri=%2Fpath%2F", data=json.dumps({"text": "..."}))
+        self.client.set_cookie("admin-session", self.app.sign({"logged": True}))
+
+        r = self.get("/admin/?mode=1")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn(b'href="https://www.example.org/path/"', r.data)
+
     def testUpdate(self):
         self.post("/new?uri=%2Fpath%2F", data=json.dumps({"text": "Lorem ipsum ..."}))
         self.put("/id/1", data=json.dumps({"text": "Hello World", "author": "me", "website": "http://example.com/"}))
