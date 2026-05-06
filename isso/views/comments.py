@@ -13,7 +13,7 @@ from functools import wraps
 from html import escape
 from io import BytesIO as StringIO
 from os import path as os_path
-from urllib.parse import unquote, urlparse, urlsplit
+from urllib.parse import unquote, urljoin, urlparse, urlsplit
 from xml.etree import ElementTree as ET
 
 from itsdangerous import SignatureExpired, BadSignature
@@ -149,6 +149,12 @@ def get_uri_from_url(url):
         return None
 
     return uri
+
+
+def comment_url(base, uri):
+    if not base or urlsplit(uri).scheme:
+        return uri
+    return urljoin(base.rstrip("/") + "/", uri)
 
 
 class API(object):
@@ -1526,6 +1532,7 @@ class API(object):
 
     def admin(self, env, req):
         isso_host_script = self.isso.conf.get("server", "public-endpoint") or local.host
+        comment_url_base = next(self.isso.conf.getiter("general", "host"), "")
         if not self.isso.conf.getboolean("admin", "enabled"):
             return render_template("disabled.html", isso_host_script=isso_host_script)
         try:
@@ -1554,6 +1561,7 @@ class API(object):
         comments_enriched = []
         for comment in list(comments):
             comment["hash"] = self.isso.sign(comment["id"])
+            comment["url"] = comment_url(comment_url_base, comment["uri"])
             comments_enriched.append(comment)
         comment_mode_count = self.comments.count_modes()
         max_page = int(sum(comment_mode_count.values()) / 100)

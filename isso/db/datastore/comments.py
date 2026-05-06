@@ -234,14 +234,23 @@ class Comments:
         if order_by not in allowed:
             order_by = "created"
 
-        def value(comment):
+        def order_value(comment):
             if order_by == "karma":
-                rv = comment["likes"] - comment["dislikes"]
-            else:
-                rv = comment.get(order_by)
-            return (comment["parent"] is not None, rv is None, rv, comment["created"])
+                return comment["likes"] - comment["dislikes"]
+            return comment.get(order_by)
 
-        return sorted(comments, key=value, reverse=not bool(asc))
+        def nullable_value(comment):
+            rv = order_value(comment)
+            return (rv is not None, rv)
+
+        def reply_group(comment):
+            if comment["parent"] is None:
+                return (False, None)
+            return (True, comment["created"])
+
+        comments = sorted(comments, key=lambda comment: comment["created"])
+        comments = sorted(comments, key=nullable_value, reverse=not bool(asc))
+        return sorted(comments, key=reply_group)
 
     def _remove_stale(self):
         stale = True

@@ -56,7 +56,7 @@ RUN virtualenv --download /isso \
 COPY ["setup.py", "pyproject.toml", "README.md", "LICENSE", "./"]
 RUN --mount=type=cache,target=/root/.cache \
   . /isso/bin/activate \
- && pip install -e .
+ && pip install -e .[datastore]
 
 # Then copy over files
 # SRC "isso/" is treated as "isso/*" by docker, so copy to subdir explicitly
@@ -69,7 +69,7 @@ COPY --from=isso-js /src/isso/js/ ./isso/js
 # Build and install Isso package (pip dependencies cached from previous step)
 RUN --mount=type=cache,target=/root/.cache \
  . /isso/bin/activate \
- && pip install -e . --no-deps
+ && pip install -e .[datastore] --no-deps
 
 
 # =====================
@@ -87,13 +87,11 @@ LABEL org.opencontainers.image.licenses=MIT
 # Clean up
 RUN rm -rf /var/apk/cache/* /tmp/* /var/tmp/*
 
-# Setup permissions for volume mounts
-RUN mkdir /db /config && chmod 1777 /db /config
-
 # Configuration
-VOLUME /db /config
+RUN mkdir /config
+COPY isso.cfg /config/isso.cfg
 EXPOSE 8080
-ENV ISSO_SETTINGS /config/isso.cfg
+ENV ISSO_SETTINGS=/config/isso.cfg
 
 # Run Isso via gunicorn WSGI server
 ENTRYPOINT ["/isso/bin/gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "--preload", "--worker-tmp-dir", "/dev/shm"]
