@@ -80,16 +80,17 @@ FROM docker.io/python:${PY_VERSION}-alpine AS isso
 WORKDIR /isso/
 COPY --from=isso-builder /isso/ .
 
-LABEL org.opencontainers.image.source=https://github.com/isso-comments/isso
+LABEL org.opencontainers.image.source=https://github.com/MattX/isso
 LABEL org.opencontainers.image.description="Isso – a commenting server similar to Disqus"
 LABEL org.opencontainers.image.licenses=MIT
 
 # Clean up
 RUN rm -rf /var/apk/cache/* /tmp/* /var/tmp/*
 
-# Configuration
-RUN mkdir /config
-COPY isso.cfg /config/isso.cfg
+# Runtime data and configuration are supplied by the deployment environment.
+# In particular, this image deliberately contains no site-specific isso.cfg.
+RUN mkdir /db /config && chmod 1777 /db /config
+VOLUME /db /config
 EXPOSE 8080
 ENV ISSO_SETTINGS=/config/isso.cfg
 

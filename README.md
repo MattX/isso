@@ -59,6 +59,25 @@ The maintainers recommend pinning the image to a
 [release tag](https://github.com/isso-comments/isso/pkgs/container/isso), e.g.
 `isso:0.13.0`.
 
+### Google Cloud Datastore fork
+
+This fork includes an optional Google Cloud Datastore / Firestore in Datastore
+mode backend. Install it with `pip install -e '.[datastore]'` and select it with
+`db = datastore` in the configuration file.
+
+The Docker image is deployment-neutral: it does not contain an `isso.cfg`.
+Mount configuration at `/config/isso.cfg` when starting the container. Keep
+site-specific settings and credentials in the repository or deployment system
+that owns the deployment, not in this source repository or container image.
+
+For example:
+
+```console
+docker run --rm -p 8080:8080 \
+  --mount type=bind,source="$PWD/isso.cfg",target=/config/isso.cfg,readonly \
+  isso:latest
+```
+
 ## Contributing
 
 - Pull requests are very much welcome! These might be

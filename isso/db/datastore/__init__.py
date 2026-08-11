@@ -29,8 +29,7 @@ class Datastore:
             from google.cloud import datastore
         except ImportError as exc:
             raise RuntimeError(
-                "The Datastore backend requires google-cloud-datastore. "
-                "Install it with `pip install isso[datastore]`."
+                "The Datastore backend requires google-cloud-datastore. Install it with `pip install isso[datastore]`."
             ) from exc
 
         section = conf.section("datastore")
