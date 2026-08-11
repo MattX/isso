@@ -27,9 +27,7 @@ class Guard:
     def _limit(self, uri, comment):
         comments = self.db.comments._all()
         recent = [
-            item
-            for item in comments
-            if item["remote_addr"] == comment["remote_addr"] and time.time() - item["created"] < 60
+            item for item in comments if item["remote_addr"] == comment["remote_addr"] and time.time() - item["created"] < 60
         ]
         if len(recent) >= self.conf.getint("ratelimit"):
             return False, "{0}: ratelimit exceeded ({1})".format(

@@ -40,6 +40,28 @@ jobs:
       env:
         PYTHONHASHSEED: random
 
+  datastore:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: pip
+        cache-dependency-path: pyproject.toml
+
+    - name: Install Isso with Datastore and test dependencies
+      run: pip install -e '.[datastore,test]'
+
+    - name: Run Datastore backend tests
+      run: pytest isso/tests/test_datastore.py
+
   lint:
 
     runs-on: ${{ matrix.os }}

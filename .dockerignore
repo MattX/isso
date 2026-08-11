@@ -4,3 +4,4 @@ node_modules/
 .venv/
 # Prevent accidental inclusion:
 comments.db
+/isso.cfg
