@@ -5,14 +5,18 @@ on:
     paths:
       - "isso/**"
       - "package.json"
+      - "package-lock.json"
       - "docker/**"
       - "docker-compose.yml"
       - "Dockerfile"
       - ".github/workflows/e2e-tests.yml"
   push:
+    branches:
+      - master
     paths:
       - "isso/**"
       - "package.json"
+      - "package-lock.json"
       - "docker/**"
       - "docker-compose.yml"
       - "Dockerfile"
@@ -21,24 +25,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      TESTBED_IMAGE: "ghcr.io/isso-comments/isso-js-testbed:latest"
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Switch testbed image to ${{ env.TESTBED_IMAGE }}
-        # Just for faster CI runs, instead of re-building the image every time
-        # Especially useful to save the time+bandwidth to re-download puppeteer & chromium
-        run: |
-          sed -i "s|isso-js-testbed|${{ env.TESTBED_IMAGE }}|g" docker-compose.yml
-          # Also remove the `build`: section so image is pulled, not built
-          sed -i '/container_name: isso-client/{n;N;N;d}' docker-compose.yml
-
-      - name: Pull testbed from ${{ env.TESTBED_IMAGE }}
-        run: docker pull ${{ env.TESTBED_IMAGE }}
+      - uses: actions/checkout@v4
 
       - name: Build the stack
-        run: docker compose build isso-server
+        run: docker compose build
 
       - name: Bring up containers
         # Don't wait for healthcheck via --wait. This would fail with a
