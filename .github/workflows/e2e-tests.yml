@@ -11,6 +11,8 @@ on:
       - "Dockerfile"
       - ".github/workflows/e2e-tests.yml"
   push:
+    branches:
+      - master
     paths:
       - "isso/**"
       - "package.json"
@@ -23,8 +25,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      TESTBED_IMAGE: "ghcr.io/isso-comments/isso-js-testbed:latest"
     steps:
       - uses: actions/checkout@v3
 
@@ -67,7 +67,7 @@ jobs:
         run: make docker-testbed TESTBED_IMAGE="${{ env.TESTBED_IMAGE }}"
 
       - name: Build the stack
-        run: docker compose build isso-server
+        run: docker compose build
 
       - name: Bring up containers
         # Don't wait for healthcheck via --wait. This would fail with a

@@ -11,13 +11,16 @@ WORKDIR /src/
 # Install everything necessary to run headless
 RUN apt-get update && apt-get install -y --no-install-recommends libnss3 libxss1 chromium
 
+# Use Debian's Chromium instead of downloading another browser through
+# Puppeteer. All JavaScript test dependencies are pinned by package-lock.json.
+ENV PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 # Install the test toolchain from the lockfile, so that the weekly image
 # rebuild keeps resolving the versions declared in package.json. Resolving
 # these fresh from the registry mixes jest majors: jest-environment-puppeteer
 # depends on jest-environment-node ^29, which does not work under jest 30.
 #
-# This pulls in puppeteer with its ~400Mb headless chrome file, so it takes a
-# while.
 COPY package.json package-lock.json ./
 RUN npm ci
 
