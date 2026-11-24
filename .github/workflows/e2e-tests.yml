@@ -28,7 +28,7 @@ jobs:
     env:
       TESTBED_IMAGE: "ghcr.io/isso-comments/isso-js-testbed:latest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Switch testbed image to ${{ env.TESTBED_IMAGE }}
         # Point compose at $TESTBED_IMAGE and drop its `build:` section, so the
